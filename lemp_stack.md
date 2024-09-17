@@ -1,4 +1,4 @@
-# LEMP Stack:Introduction
+# LEMP_STACK: Introduction
 
 The LEMP stack is a widely adopted open-source web development framework, known for its efficiency in deploying and managing dynamic web applications. LEMP stands for **Linux**, **Nginx**, **MySQL**, and **PHP** (though sometimes **Perl** or **Python** are used instead of PHP). Each component plays a crucial role in ensuring the stack's stability and performance. This technical documentation provides a detailed guide on how to install, configure, and manage the LEMP stack for optimal performance.
 
@@ -27,6 +27,7 @@ SSH (22)
 HTTP (80)
 HTTPS (443)
 - Launch a new instance:
+
 ![WhatsApp Image 2024-09-16 at 16 08 02_929650c2](https://github.com/user-attachments/assets/d0ce4a07-8a67-4219-ad3a-90fd9b3e7c5f)
 
 Once the instance is running, connect to it via SSH.
@@ -37,7 +38,7 @@ ssh -i /path/to/your-key.pem ubuntu@<your-ec2-public-ip>
 
 ![WhatsApp Image 2024-09-17 at 11 01 23_6ae2ebff](https://github.com/user-attachments/assets/36960b9a-cd4b-4bd7-a54c-2337eba2a022)
 
-## Step 2: Nginc Web Server Installation
+## Step 2: Nginx Web Server Installation
 In order to display web pages to site visitoers,we would install Nginx ,Ahigh-performance web server using the apt package manager to install it.
 
 ```bash
@@ -138,8 +139,7 @@ server {
   }
 }
 ```
-- #### Explanation of bloacks and directives within the bare-metal configuration
-### Explanation of Nginx Server Block Directives
+#### Explanation of blocks and directives within the bare-metal configuration
 
 - **server { ... }**: This defines a **server block**, which is a set of configuration rules for handling specific domain requests.
 
@@ -151,17 +151,15 @@ server {
 
 - **index index.html index.htm index.php;**: This tells Nginx which file to serve as the default when a user visits the root of the website (e.g., `index.html`, `index.php`).
 
-### Location Blocks
-
 - **location / { ... }**: This block handles all requests to the root directory. The `try_files` directive checks if the requested file exists; if not, it tries the directory, and if neither exists, it returns a 404 error.
 
 - **location ~ \.php$ { ... }**: This block handles requests for PHP files. It includes the FastCGI configuration (`snippets/fastcgi-php.conf`) and sends the PHP requests to the **PHP-FPM** process running at the socket `php8.1-fpm.sock`.
 
 - **location ~ /\.ht { ... }**: This block denies access to any `.ht` files, typically used for Apache configurations, for security purposes.
 
-This configuration ensures that Nginx handles static files, PHP processing, and secures certain sensitive files.
+  *This configuration ensures that Nginx handles static files, PHP processing, and secures certain sensitive files.*
 
-**Activate the configuration by linking to the config file from Nginx sites-enabled directory:**
+- **Activate the configuration by linking to the config file from Nginx sites-enabled directory:**
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/projectLEMP /etc/nginx/sites-enabled/
@@ -188,6 +186,158 @@ sudo systemctl reload nginx
 ```
 The new website is now active but the web root /var/www/projectLEMP is still empty. Create an index.html file in this location so to test the virtual host work as expected.
 
-sudo echo ‘Hello LEMP from hostname’
+```bash
+sudo echo "Hello LEMP from hostname"
+``
+
+Go to your browser and try to open th websitre URL using the IP address or the curl command from your Terminal:
+
+
+```bash
+http://44.200.28.108:8O
+```
+
+![WhatsApp Image 2024-09-17 at 00 08 08_2eedf1ba](https://github.com/user-attachments/assets/2ab1cb88-7a47-4a86-8429-0603907a56f3)
+
+![WhatsApp Image 2024-09-17 at 00 09 10_d7dc9ef7](https://github.com/user-attachments/assets/72b4e443-a40e-4df9-8e8a-1456f29dab7a)
+
+This file can serve as a temporary landing page for the application until you set up the `index.php` file. Once the `index.php` file is ready, remove or rename the `index.html` file in the document root, as `index.html` will be loaded first by default.
+
+The LEMP stack is now fully set up. At this point, everything is installed and the stack is ready for use.
 
 Open you browser and access it to confirm the set-up and be certain the index.html is up and working.
+
+## Step 6:
+Test the LEMP stack to validate that Nginx can handle the .php files off to the PHP processor.
+
+- Create a test PHP file in the document root. Open a new file called info.php within the document root.
+
+```bash
+sudo nano /var/www/projectLEMP/info.php
+```
+
+```bash
+<?php
+phpinfo();
+```
+Go to your browser and try to open the website URL using the IP address:
+
+```bash
+http://44.200.28.108/info.php
+```
+You will see a web page containing detailed information of your server:
+
+![WhatsApp Image 2024-09-17 at 00 27 29_1e6747df](https://github.com/user-attachments/assets/70ed921e-804e-4e83-989d-ecefb3d47be4)
+
+Scrolling down with give us more information:
+
+![WhatsApp Image 2024-09-17 at 00 27 56_84afa846](https://github.com/user-attachments/assets/5728b4d0-9098-434a-9698-f388dbe51823)
+
+After confirming and checking the information about the PHP Server it is best to remove the file you have created as it contains sensitive information about the PHP environment.You can use `rm` command to remove the file:
+
+```bash
+sudo rm /var/www/projectLEMP/info.php
+```
+
+## Step 7: Retrieving data from MySQL databsae with PHP
+
+We will create a test database with a simple "To-Do list" and configure it so that the Nginx website can query data from the database and display it.
+
+Currently, the MySQL PHP library (mysqlnd) does not support **caching_sha2_authentication**, which is the default method in MySQL 8. To connect PHP to the MySQL database, we need to create a new user using the **mysql_native_password** authentication method.
+
+- **First, connect to the MySQL console using the root account.**
+
+```bash
+sudo mysql -p
+```
+- ** Create a database,run the following command in the MySQL Console:
+- 
+```bash
+CREATE DATABASE version1_db;
+```
+
+Create a new user and grant full priviledges on the database you have created
+
+```bash
+CREATE USER 'version1_user'@'%' IDENTIFIED WITH mysql_native_password BY 'PassWord.1';
+```
+Give this user permission over the `version1_db`
+
+```bash
+GRANT ALL ON version1_db.* TO 'version1_user'@'%';
+```
+![WhatsApp Image 2024-09-17 at 00 43 10_8f3a694e](https://github.com/user-attachments/assets/3d722510-b852-40ad-a0fb-e0416fe63862)
+
+Now exit the MySQL shell:
+
+```bash
+exit
+```
+- **Verify the new user has proper permissions by logging into the MySQL console again using the custom user credentials.
+
+```bash
+mysql -u version1_user -p
+```
+
+- **In the MySQL console,onfirm that you have access to the version1_db you have created:**
+
+```bash
+SHOW DATABASE;
+```
+
+You will get the following output:
+
+![WhatsApp Image 2024-09-17 at 00 48 21_0a4d6655](https://github.com/user-attachments/assets/2d524a4d-7aef-4627-9f74-fefb6c519e7d)
+
+Now we will create a 'todo_list' from the MySQL console:
+
+``bash
+CREATE TABLE todo_database.todo_list (
+  item_id INT AUTO_INCREMENT,
+  content VARCHAR(255),
+  PRIMARY KEY(item_id)
+);
+```
+
+- **Insert a few rows of content to the test table.**
+
+```bash
+INSERT INTO version1_db.todo_list (content) VALUES ("My first important item");
+
+INSERT INTO version1_db.todo_list (content) VALUES ("My second important item");
+
+INSERT INTO version1_db.todo_list (content) VALUES ("My third important item");
+
+INSERT INTO version1_db.todo_list (content) VALUES ("and this one more thing");
+```
+
+To confirm that the data was successfully saved to your table run:
+
+```bash
+SELECT * FROM version1_db.todo_list;
+```
+This should be the output:
+
+![WhatsApp Image 2024-09-17 at 01 07 37_e207d681](https://github.com/user-attachments/assets/305fb25f-6da2-4350-9d31-f2ccb4a33725)
+
+Now we can create a PHP script that will connect to MySQL and query for content
+
+```bash
+nano /var/www/projectLEMP/todo_list.php
+```
+
+
+The script connects to the MySQL database and queries for the content of the todo_list table
+
+![WhatsApp Image 2024-09-17 at 01 16 33_e4ffad2d](https://github.com/user-attachments/assets/ac6052e7-f57c-4651-9ce9-bd5b5c37b9af)
+
+Save the file and acess this page in your web browser by visiying the public IP addresss configured for your website,followed by todo_list.php:
+
+```bash
+http://44.200.28.108/todo_list.php
+```
+This should be the output showing the content you have in the test table:
+
+![WhatsApp Image 2024-09-17 at 01 18 30_063df431](https://github.com/user-attachments/assets/ecff68aa-eccc-4b0a-be95-95f1e90c8ccb)
+
+## This means your PHP environment is ready to connect and interact with your MySQL Server
