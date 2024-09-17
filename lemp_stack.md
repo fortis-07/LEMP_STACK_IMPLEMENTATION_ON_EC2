@@ -25,7 +25,7 @@ By combining these components, the LEMP stack offers a robust, scalable, and fle
 Security Group: Open the following ports:
 SSH (22)
 HTTP (80)
-HTTPS (443)
+
 - Launch a new instance:
 
 ![WhatsApp Image 2024-09-16 at 16 08 02_929650c2](https://github.com/user-attachments/assets/d0ce4a07-8a67-4219-ad3a-90fd9b3e7c5f)
