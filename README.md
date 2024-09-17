@@ -11,12 +11,19 @@ The LEMP stack is popular for its performance and flexibility. Linux (Ubuntu), N
 
 #### Step 1: Launch an EC2 Instance
 Log in to AWS: Open the AWS Management Console and go to EC2.
+
 Launch Instance:
+
 AMI: Select Ubuntu 22.04 LTS.
+
 Instance Type: Choose t2.micro (free-tier eligible).
+
 Key Pair: Select or create a key pair for SSH.
-Security Group: Allow ports 22 (SSH), 80 (HTTP), and 443 (HTTPS).
+
+Security Group: Allow ports 22 (SSH), 80 (HTTP)
+
 Launch the instance and note its public IP address.
+
 #### Step 2: Connect to the EC2 Instance
 #### Step 3: Install Nginx
 #### Step 4: Install MySQL
